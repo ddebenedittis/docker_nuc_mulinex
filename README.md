@@ -22,3 +22,17 @@ Run the container:
 ```shell
 ./docker/run.bash
 ```
+
+## SSH Connection with PC
+
+To connect to the NUC from your PC, run
+```shell
+sudo cp net_conf/wifi_conf.yaml /etc/netplan/50-cloud-init.yaml
+sudo netplan apply --debug
+```
+
+To revert the changes and enable connecting the NUC to the internet, run
+```shell
+sudo cp net_conf/wired_conf.yaml /etc/netplan/50-cloud-init.yaml
+sudo netplan apply --debug
+```
