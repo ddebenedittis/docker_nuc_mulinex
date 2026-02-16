@@ -1,17 +1,16 @@
 services:
-  ros2_humble_mulinex:
+  nuc_mulinex:
     build:
       context: .
       dockerfile: docker/DockerFile
       args:
         - BASE_IMAGE=osrf/ros
-        - BASE_TAG=jazzy-desktop-full
-        - DISTRO=jazzy
-        - IMAGE_NAME=docker_control_simulation
-        - IMAGE_TAG=0.1
-        - WORKSPACE=docker_client_ws
+        - BASE_TAG=humble-desktop-full
+        - DISTRO=humble
+        - IMAGE_NAME=nuc_mulinex
+        - WORKSPACE=mulinex_ws
 
-    container_name: ros2_humble_mulinex_container
+    container_name: nuc_mulinex_humble
     # networks:
       # mulinex_cabled:
       #   ipv4_address: 100.100.100.16   # scegli un IP libero nella LAN
@@ -46,7 +45,7 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       # - /tmp/.docker.xauth:/tmp/.docker.xauth:rw
       - ~/.bash_history:/home/ros/.bash_history
-      - ./src:/home/ros/docker_client_ws/src
+      - ./src:/home/ros/mulinex_ws/src
       - /dev/input:/dev/input
       - /dev/dri:/dev/dri
       - /dev/nvidia0:/dev/nvidia0

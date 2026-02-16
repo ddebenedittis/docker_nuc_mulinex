@@ -6,9 +6,8 @@ cd "$(dirname "$(dirname "$(realpath "${BASH_SOURCE[0]}")")")"
 # ================================= Edit Here ================================ #
 
 BASE_IMAGE=osrf/ros
-BASE_TAG=jazzy-desktop
-ROS_NUMBER=2
-IMAGE_NAME=control_arm_temperature
+BASE_TAG=humble-desktop-full
+IMAGE_NAME=nuc_mulinex
 
 # =============================== Preliminaries ============================== #
 
@@ -77,10 +76,9 @@ docker build \
     ${cache} \
     --build-arg BASE_IMAGE=$BASE_IMAGE \
     --build-arg BASE_TAG=$BASE_TAG \
-    --build-arg ROS_NUMBER=$ROS_NUMBER \
     --build-arg MYUID=${UID} \
     --build-arg MYGID=${GID} \
     --build-arg USER=${USER} \
     --build-arg "PWDR=$PWD" \
     -t $IMAGE_NAME \
-    -f docker/Dockerfile .
+    -f docker/DockerFile .

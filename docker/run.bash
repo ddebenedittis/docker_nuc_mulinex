@@ -8,7 +8,7 @@ then
     xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $XAUTH nmerge -
 fi
 
-IMAGE_NAME=control_arm_temperature
+IMAGE_NAME=nuc_mulinex
 
 xhost +
 docker run \
