@@ -8,7 +8,8 @@ then
     xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $XAUTH nmerge -
 fi
 
-IMAGE_NAME=nuc_mulinex
+IMAGE_NAME=mulinex
+IMAGE_TAG=humble
 
 xhost +
 docker run \
@@ -25,9 +26,16 @@ docker run \
     --env="XAUTHORITY=$XAUTH" \
     --volume="$XAUTH:$XAUTH" \
     --volume="/dev/dri:/dev/dri" \
+    -v /dev/input:/dev/input \
+    `# Privileged mode for device access.` \
+    --privileged \
+    `# ROS 2 settings.` \
+    --env="ROS_DOMAIN_ID=10" \
+    --env="RMW_IMPLEMENTATION=rmw_cyclonedds_cpp" \
+    --env="RCUTILS_COLORIZED_OUTPUT=1" \
     `# Mount the folders in this directory.` \
     -v ${PWD}:${PWD} \
-    -v ~/docker/${IMAGE_NAME}/Plotjuggler:/home/davide/.config/PlotJuggler \
+    -v ~/docker/${IMAGE_NAME}/Plotjuggler:/home/$USER/.config/PlotJuggler \
     `# Preserve bash history for autocomplete).` \
     --env="HISTFILE=/home/.bash_history" \
     --env="HISTFILESIZE=$HISTFILESIZE" \
@@ -47,5 +55,6 @@ docker run \
     `# Matplotlib environment variable.` \
     --env="MPLCONFIGDIR=/home/$USER/.matplotlib" \
     --env="XDG_RUNTIME_DIR=/tmp/runtime-$USER" \
-    ${IMAGE_NAME} \
+    --name mulinex \
+    ${IMAGE_NAME}:${IMAGE_TAG} \
     bash

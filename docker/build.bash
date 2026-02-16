@@ -7,16 +7,12 @@ cd "$(dirname "$(dirname "$(realpath "${BASH_SOURCE[0]}")")")"
 
 BASE_IMAGE=osrf/ros
 BASE_TAG=humble-desktop-full
-IMAGE_NAME=nuc_mulinex
+IMAGE_NAME=mulinex
+IMAGE_TAG=humble
 
 # =============================== Preliminaries ============================== #
 
-mkdir -p build log src
-if [[ $ROS_NUMBER == 1 ]]; then
-    mkdir -p devel
-elif [[ $ROS_NUMBER == 2 ]]; then
-    mkdir -p install
-fi
+mkdir -p build install log src
 
 mkdir -p ~/.vscode ~/.vscode-server ~/.config/Code
 mkdir -p ~/docker/${IMAGE_NAME}/Plotjuggler
@@ -80,5 +76,5 @@ docker build \
     --build-arg MYGID=${GID} \
     --build-arg USER=${USER} \
     --build-arg "PWDR=$PWD" \
-    -t $IMAGE_NAME \
+    -t $IMAGE_NAME:$IMAGE_TAG \
     -f docker/DockerFile .

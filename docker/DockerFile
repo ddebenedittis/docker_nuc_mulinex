@@ -7,40 +7,41 @@ FROM ${BASE_IMAGE}:${BASE_TAG}
 ENV DEBIAN_FRONTEND=noninteractive
 
 # RUN is used to execute and add new layer on top of the base immage
-RUN apt-get update && apt-get install -y \
-    ros-$ROS_DISTRO-plotjuggler \
-    ros-$ROS_DISTRO-ros-gz \
+RUN --mount=type=cache,sharing=locked,target=/var/cache/apt \
+    --mount=type=cache,sharing=locked,target=/var/lib/apt \
+    apt-get update && apt-get install --no-install-recommends -qqy \
+    ros-$ROS_DISTRO-ign-ros2-control \
     ros-$ROS_DISTRO-joint-state-publisher \
     ros-$ROS_DISTRO-joint-state-publisher-gui \
-    ros-$ROS_DISTRO-ign-ros2-control \
-    ros-$ROS_DISTRO-teleop-twist-joy \
     ros-$ROS_DISTRO-joy \
     ros-$ROS_DISTRO-pinocchio \
-    ros-$ROS_DISTRO-ros2-control \
-    ros-$ROS_DISTRO-ros2-controllers \
-    ros-$ROS_DISTRO-xacro \
-    ros-$ROS_DISTRO-rosbag2-storage-mcap \
+    ros-$ROS_DISTRO-plotjuggler \
     ros-$ROS_DISTRO-plotjuggler-ros \
     ros-$ROS_DISTRO-rmw-cyclonedds-cpp \
+    ros-$ROS_DISTRO-ros-gz \
+    ros-$ROS_DISTRO-ros2-control \
+    ros-$ROS_DISTRO-ros2-controllers \
+    ros-$ROS_DISTRO-rosbag2-storage-mcap \
     ros-$ROS_DISTRO-rviz2 \
-    pipx \
+    ros-$ROS_DISTRO-teleop-twist-joy \
+    ros-$ROS_DISTRO-xacro \
     chrony \
-    tmux python3-pip \
-    xterm \
+    git \
+    iproute2 \
+    iputils-ping \
     libeigen3-dev \
     nano \
     nautilus \
-    iputils-ping \
-    iproute2 \
+    pipx \
+    python3-pip \
     python3-rosdep \
-    sudo git \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    sudo \
+    tmux \
+    xterm
 
 ARG MYUID=1000
 ARG MYGID=1000
 ARG USER=ros
-ARG PWDR=/
 
 RUN OLD_USER=$(awk -v uid="$MYUID" -F ':' '$3==uid {print $1}' /etc/passwd) \
     && if [ -z "${OLD_USER}" ]; then \
@@ -68,25 +69,24 @@ USER ${USER}
 ENV HOME=/home/${USER}
 
 # Set up workspace
-ARG WORKSPACE=docker_navigation
+ARG WORKSPACE=mulinex_ws
 WORKDIR /home/${USER}/${WORKSPACE}
 
 # Install python packages as user
+ENV PIP_BREAK_SYSTEM_PACKAGES=1
 RUN pip3 install --user numpy
 
 # Set up environment
-COPY ./docker/.config/update_bashrc_ros_2 /sbin/update_bashrc_ros_2
-
-RUN sudo chmod +x /sbin/update_bashrc_ros_2 ; sudo chown ${USER} /sbin/update_bashrc_ros_2 \
- && echo 'echo "source '${PWDR}'/install/setup.bash" >> ~/.bashrc' >> /sbin/update_bashrc_ros_2 \
- && cat /sbin/update_bashrc_ros_2 \
- && sync ; /bin/bash -c /sbin/update_bashrc_ros_2 ; sudo rm /sbin/update_bashrc_ros_2
+RUN echo "" >> ~/.bashrc \
+ && echo "## ROS 2" >> ~/.bashrc \
+ && echo 'source /opt/ros/$ROS_DISTRO/setup.bash' >> ~/.bashrc \
+ && echo "source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash" >> ~/.bashrc \
+ && echo "source /home/${USER}/${WORKSPACE}/install/setup.bash" >> ~/.bashrc
 
 # Change entrypoint to source ~/.bashrc and start in ~
 COPY ./docker/.config/entrypoint.sh /ros_entrypoint.sh
 RUN sudo chmod +x /ros_entrypoint.sh ; sudo chown ${USER} /ros_entrypoint.sh \
- && echo "cd "${PWDR} >> /ros_entrypoint.sh \
- && echo 'exec bash -i -c $@' >> /ros_entrypoint.sh \
+ && echo 'exec bash -i -c "$@"' >> /ros_entrypoint.sh \
  && cat /ros_entrypoint.sh
 
 ENTRYPOINT ["/ros_entrypoint.sh"]

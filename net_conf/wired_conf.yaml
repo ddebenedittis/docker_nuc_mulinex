@@ -5,12 +5,12 @@
 # network: {config: disabled}
 network:
     version: 2
+    renderer: NetworkManager
     ethernets:
       eth0:
         dhcp4: false
         addresses: [100.100.100.3/24]
     wifis:
-        renderer: networkd
         wlan0:
             access-points:
                 CrossLab-AdvancedManufacturing5G:
